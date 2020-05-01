@@ -1,0 +1,36 @@
+// Remove the IE attach event once we stop supporting IE8
+function addEvent(el, event, fn) {
+	if(el.addEventListener) {
+		el.addEventListener(event, fn, false);
+	} else {
+		el.attachEvent('on' + event, fn);
+	}
+}
+// use this to add multiple space separated events to one handler 
+function addMultipleEvents(events, el, fn) {
+	var evts = events.split(' ');
+	var evtsLen = evts.length;
+	for (var i=0; i < evtsLen; i++) {
+		addEvent(el, evts[i], fn);
+	}
+}
+
+function onIframeMouseUp() {
+    var msg = {
+        action : 'onIframeMouseUp',
+        message: 'mouseup'
+    };
+    window.parent.postMessage(JSON.stringify(msg), '*');
+}
+
+function IframeDomReady() {
+	var el = document.body;
+	addMultipleEvents('mouseup touchend', el, onIframeMouseUp);
+}
+
+if(document.readyState != 'loading') {
+	IframeDomReady();
+} else {
+	document.addEventListener('DOMContentLoaded', IframeDomReady);
+}
+

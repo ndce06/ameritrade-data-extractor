@@ -1,0 +1,39 @@
+/*more icon can have error inside it in saved orders, use different image*/
+td.morecell{vertical-align:top;background:url(/amer/images/more.gif) 0px 6px no-repeat; width:13px;height:13px;}
+td.moreerrorcell{vertical-align:top;background:url(/amer/images/more_error.gif) 0px 5px no-repeat; width:13px;height:13px;}
+td.morecell a, td.morecell a:hover, td.moreerrorcell a, td.moreerrorcell a:hover{background: none; display: block; width: 13px; height: 13px;margin-top:6px}
+.moreicon {background: none; cursor:pointer;cursor:hand;border:none;font-size:1px;line-height:1px;}
+.moreiconError{cursor:pointer;cursor:hand;margin-right:2px;border:none;font-size:1px; line-height:1px;}
+.moreinfo { border-right:2px solid #999; border-bottom:2px solid #999; }
+
+table.p01 { border-left:1px solid #ccc; border-right:1px solid #ccc; border-bottom:1px solid #ccc; }
+table.p01 tr.headerspace td { height:8px; }
+
+table.p02 tr.header td { height:23px; color:#003366; font-weight:bold; font-size:11px; background-color:#000; vertical-align:middle; border-bottom:1px solid #003366; }
+table.p02 td { height:18px; background-color:#f4f4f4; vertical-align:top; font-size:11px;white-space:nowrap;}
+table.p02 td.wrap  {background-color:#f4f4f4; vertical-align:top; font-size:11px;white-space:normal;}
+ 
+table.p02 .boldheader { height:18px; font-weight:bold; vertical-align:top; }
+table.p02 .bottom { height:26px; border-top:1px solid #ccc; }
+table.p02 tr.spacer td { height:15px; vertical-align:middle; }
+table.p02 .moredivider {border-top:1px dotted #999;}
+table.p02 a { color:#36c; }
+table.p02 .primary_more {color:#0158c4;font-weight:bold;}
+table.p02 .morebulletUL { list-style-type: none;padding: 0;margin: 0; }
+table.p02 .morebulletLI { background-image: url(/amer/images/graybullet.gif);background-repeat: no-repeat;background-position: 0 .5em;padding-left: .6em; }
+
+table.p03 {border:1px solid #999999;background-color:#F7F7F7;}
+table.p03 td{ height:25px; font-size:11px; white-space:nowrap; padding-left:6px;}
+table.p03 td.data {text-align:right;font-weight:bold; padding-left:0px;width:144px;white-space:nowrap; }
+table.p03 td.datainfo {text-align:left;font-weight:bold; padding-left:14px;width:358px;}
+table.p03 tr.rows td {border-top:1px solid #D8D8D8;}
+table.p03 tr.rows td.nb, td.nb {border-top:1px solid #F7F7F7;padding-left:0px;}
+table.p03 tr.last td {padding-top:4px;padding-bottom:12px;}
+table.p03 tr.imgs td span{height:20px;padding:0px 6px 0px 0px;color:#737373;font-weight:bold;font-size:9px;}
+table.p03 tr.imgs td span img{margin-right:4px;margin-top:0px;vertical-align:top;}
+table.p03 tr.title td{height:20px;font-weight:bold;font-size:11px;vertical-align:bottom;padding-left:6px;}
+table.p03 tr.title td.close{color:#3366CC;text-align:right;font:bold 11px arial;}
+table.p03 tr.desc td{height:22px;font-size:11px;vertical-align:top;}
+table.p03 tr.disctop td{color:#808080;font-size:11px;border-top:1px solid #D8D8D8;padding-top:7px;}
+table.p03 tr.discline td, table.p03 tr.disc td {height:13px;color:#808080;font-size:11px;}
+table.p03 tr.disc td{padding-bottom:24px;}

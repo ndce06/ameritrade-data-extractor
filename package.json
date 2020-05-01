@@ -1,0 +1,17 @@
+{
+  "name": "ameritrade-data-extractor",
+  "version": "1.0.0",
+  "description": "ameritrade data extractor tool",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Nirav Patel",
+  "license": "ISC",
+  "dependencies": {
+    "dayjs": "^1.8.26",
+    "prompt": "^1.0.0",
+    "puppeteer": "^3.0.2",
+    "xlsx": "^0.16.0"
+  }
+}

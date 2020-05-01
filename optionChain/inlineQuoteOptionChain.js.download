@@ -1,0 +1,222 @@
+var addToWatchlistSymbol, addToWatchlistDesc, addToWatchlistOddDel, watchlistDropdownVisible = false;
+
+function getQuote(symbol, refresh) {
+    addToWatchlistSymbol = symbol;
+    if (!refresh) hideQuote();
+    var oldOptionReference = (symbol.indexOf('+') != -1) ? true : false;
+    var symbolPrefix = (oldOptionReference) ? "%2b" : "";
+    var urlSymbol = (oldOptionReference) ? symbolPrefix + symbol.substring(1, symbol.length) : symbol;
+    var trigSymbol = (oldOptionReference) ? symbol.substring(1, symbol.length) : symbol;
+    var startURL = "/cgi-bin/apps/xml/Quote?symbol=" + urlSymbol;
+    $.ajax({
+        type: "GET",
+        url: startURL,
+        dataType: "xml",
+        error: function() {
+            hideQuote();
+        },
+        success: function(xml) {
+            var pageError = $(xml).find('amtd').find('error').text();
+            if (pageError) hideQuote();
+            else {
+                toggleAddToWatchlist(true); //hide add to watchlist dropdown if already open
+                $("#moreAjaxMsg").hide(); //hide add to watchlist confirmation message
+
+                var symbolAssetType = $(xml).find('asset-type').text();
+                if (symbolAssetType == "O") { //only display option quotes
+                    var cform = document.chain;
+                    var chg = $(xml).find('change').text(); //determine change color
+                    var chgClass = (chg.indexOf("-") != -1) ? "neg_change" : (chg == "0.00") ? "" : "pos_change";
+                    document.getElementById("moreChange").className = chgClass;
+                    document.getElementById("morePercChange").className = chgClass;
+
+                    var vol = $(xml).find('volume').text();
+                    var volFormat = new RegExp('([0-9]+)([0-9]{3})'); //format with commas
+                    while (volFormat.test(vol)) vol = vol.replace(volFormat, '$1,$2');
+                    var rt = $(xml).find('real-time').text();
+                    var qTxt = (rt == "true") ? "Real time quote provided by " : "<div class='delayed' style='margin-right:5px'>D</div>" + document.getElementById("delayedTxt").innerHTML;
+                    qTxt += $(xml).find('exchange').text() + " @ " + $(xml).find('stamp').text();
+                    var refreshIcon = "&nbsp;&nbsp;<a href='#' onClick='getQuote(\"" + symbol + "\",true);return false;'><img src='/amer/images/refresh_blue_trans.gif' style='vertical-align:bottom;margin-bottom:1px;'></a>";
+                    var odddel = $(xml).find('odd-deliverable').text();
+                    var desc = $(xml).find('description').text();
+                    addToWatchlistDesc = desc;
+                    addToWatchlistOddDel = odddel;
+                    var origin = (cform.tabid.value == "" || cform.tabid.value == "0" || cform.tabid.value == "5") ? cform.origin.value : "";
+                    var triggerOrigin = (origin == "triggeralert" || origin == "triggerorder");
+                    var askLink = "<a href='#' onClick='document.getElementById(\"asklink_" + holdmoreid + "\").onclick();return false;'>" + $(xml).find('ask').text() + "</a>";
+                    var bidLink = "<a href='#' onClick='document.getElementById(\"bidlink_" + holdmoreid + "\").onclick();return false;'>" + $(xml).find('bid').text() + "</a>";
+                    var buyLink = '<a href="#" onClick="populateLeg(\'' + origin + '\',' + cform.tabid.value + ',\'' + cform.leg.value + '\',\'' + symbol + '\',\'' + desc + '\',\'' + odddel + '\',\'\',\'buy\');return false;">' + 'Buy</a>';
+                    var sellLink = '<a href="#" onClick="populateLeg(\'' + origin + '\',' + cform.tabid.value + ',\'' + cform.leg.value + '\',\'' + symbol + '\',\'' + desc + '\',\'' + odddel + '\',\'\',\'sell\');return false;">' + 'Sell</a>';
+                    var trigPipe = (trigOptions) ? "<span class='ql_breadcrumb_pipe'>|</span>" : "";
+                    var buySellLinks = (!triggerOrigin) ? buyLink + "<span class='ql_breadcrumb_pipe'>|</span>" + sellLink + trigPipe : "";
+                    var trigTxt = (origin == "triggerorder") ? "Select This Contract for a Triggered Order" : "Set Trade Trigger";
+                    var trigLink = "<a href='#' onclick='setTriggerOption(\"" + origin + "\",\"" + trigSymbol + "\",\"" + desc + "\",\"" + odddel + "\",\"" + $(xml).find('ask').text() + "\");return false;'>" + trigTxt + "</a>";
+                    var addToWatchlist = (!triggerOrigin) ? '<span class="ql_breadcrumb_pipe">|</span><a href="#" id="watchlistBreadcrumb" onclick="addToWatchlistDialog(); return false;">Add to watch list</a>' : '';
+                    if (odddel != "") {
+                        $("#moreNotes").html(odddel);
+                        $("#moreNotes,#moreNS").show();
+                    } else {
+                        $("#moreNotes,#moreNS").hide();
+                    }
+
+                    if (trigOptions) $("#moreLinks").html(buySellLinks + trigLink + addToWatchlist);
+                    else $("#moreLinks").html(buySellLinks + addToWatchlist);
+
+                    $("#moreLast").html($(xml).find('last').text());
+                    $("#moreLastTrade").html($(xml).find('last-trade-date').text());
+                    $("#moreChange").html(chg);
+                    $("#morePercChange").html($(xml).find('change-percent').text());
+                    $("#moreOpen").html($(xml).find('open').text());
+                    $("#morePrevClose").html($(xml).find('close').text());
+                    $("#moreHigh").html($(xml).find('high').text());
+                    $("#moreLow").html($(xml).find('low').text());
+                    $("#moreTimeValue").html($(xml).find('time-value-index').text());
+                    $("#moreBid").html(bidLink);
+                    $("#moreAsk").html(askLink);
+                    $("#moreBASize").html($(xml).find('bid-ask-size').text());
+                    $("#moreVolume").html(vol);
+                    $("#moreOpenInterest").html($(xml).find('open-interest').text());
+                    $("#moreRealTimeTxt").html(qTxt);
+                    $("#moreRefresh").html(refreshIcon);
+                    $("#displaymoretable").show();
+                } else hideQuote();
+            }
+        }
+    });
+}
+
+function hideQuote() {
+    $("#displaymoretable").hide();
+}
+
+function toggleAddToWatchlist(forceHide) {
+    if (arguments.length < 1) {
+        forceHide = false;
+    }
+
+    if (watchlistDropdownVisible || forceHide) {
+        $("#addToWatchlistOverlay").hide();
+        $("#addToWatchlistDropdown").hide();
+        watchlistDropdownVisible = false;
+    } else {
+        var watchlistOverlay = $("#addToWatchlistOverlay");
+        var watchlistBreadcrumbPos = $("#watchlistBreadcrumb").position();
+
+        watchlistOverlay.css({
+            'display': 'block',
+            'top': watchlistBreadcrumbPos.top - 7,
+            'left': watchlistBreadcrumbPos.left - 10
+        });
+
+        var watchlistOverlayPos = watchlistOverlay.position();
+        var addToWatchlistDropdown = $("#addToWatchlistDropdown");
+
+        addToWatchlistDropdown.css({
+            'display': 'block',
+            'top': watchlistOverlayPos.top + watchlistOverlay.outerHeight() - 1,
+            'left': watchlistOverlayPos.left
+        });
+        watchlistDropdownVisible = true;
+    }
+}
+
+function addToWatchlist(id) { //repeated old symbology test due to symbol detail page
+    var symbol = addToWatchlistSymbol;
+    var oldOptionReference = (symbol.indexOf('+') != -1) ? true : false;
+    var symbolPrefix = (oldOptionReference) ? "%2b" : "";
+    var urlSymbol = (oldOptionReference) ? symbolPrefix + symbol.substring(1, symbol.length) : symbol;
+    var desc = addToWatchlistDesc;
+    var odddel = addToWatchlistOddDel;
+    if (id) { //add to existing watchlist
+        var useLocalPage = false; //test if have function on page, but catch third party access denied errors
+        try {
+            useLocalPage = (chainpopup && lpath.ocId && lpath.ocId == "wledit" && lpath.originalID == id); //editing current watchlist
+        } catch (e) {}
+        if (useLocalPage) {
+            lpath.addOptionSymbol(symbol, desc, odddel);
+            if (chainpopup) window.close();
+        } else {
+            //send ajax request to save here (pass id, symbol and description)			
+            $.ajax({
+                type: "GET",
+                url: "/cgi-bin/apps/u/WatchListAddSymbol",
+                data: "watchlistID=" + id + "&symbol=" + urlSymbol + "&description=" + desc,
+                dataType: "text",
+                error: function() {
+                    // set message box to error class and display error
+                    $("#moreAjaxMsg").show().removeClass("ql_confirmation").addClass("ql_error");
+                    $("#moreAjaxMsgContent").html("System is temporarily unavailable. Please try again later or contact a Client Services representative.");
+                },
+                success: function(txt) {
+                    // set message box to confirmation (success) class
+                    $("#moreAjaxMsg").show().removeClass("ql_error").addClass("ql_confirmation");
+
+                    // extract status and text out of return string (txt, who's format is: "status=error&text=there was an error...")
+                    var status, text;
+                    var temp = txt.split("&");
+                    status = temp[0].split("=")[1];
+                    text = temp[1].split("=")[1];
+                    $("#moreAjaxMsgContent").html(text);
+
+                    if (status == "error") {
+                        // set message box to error class
+                        $("#moreAjaxMsg").show().removeClass("ql_confirmation").addClass("ql_error");
+                    }
+                },
+                complete: function() {
+                    // close watchlist dropdown
+                    toggleAddToWatchlist();
+                }
+            });
+
+            var refreshLocalPage = false; //refresh only if on watchlist display page, but catch third party access denied errors
+            try {
+                refreshLocalPage = (chainpopup && lpath.ocId && lpath.ocId == "wldisplay"); //viewing watchlist display				
+            } catch (e) {}
+            if (refreshLocalPage) {
+                //if name of watchlist changed is on the display page, refresh page and add a page jump to it
+                var frm = lpath.document.temp;
+                var str = "";
+                for (var i = 0; i < frm.length; i++) {
+                    if (frm.elements[i].type == "select-one" && frm.elements[i].options[frm.elements[i].selectedIndex].value == id) {
+                        var refreshId = "r" + frm.elements[i].name;
+                        lpath.location.href = "/cgi-bin/apps/u/WatchListDisplay?refresh=" + refreshId;
+                        break;
+                    }
+                }
+            }
+            //do NOT close the window
+        }
+    } else { //new watchlist
+        var useLocalPage = false; //test if have function on page, but catch third party access denied errors
+        try {
+            useLocalPage = (chainpopup && lpath.ocId && lpath.ocId == "wlcreate"); //on wl create page
+        } catch (e) {}
+        if (useLocalPage) {
+            lpath.addOptionSymbol(symbol, desc, odddel);
+        } else lpath.location.href = "/cgi-bin/apps/u/WatchListCreate?symbols=" + urlSymbol;
+
+        if (chainpopup) window.close();
+    }
+}
+
+function addToWatchlistDialog() {
+    var symbol = addToWatchlistSymbol;
+    var oldOptionReference = (symbol.indexOf('+') != -1) ? true : false;
+    var symbolPrefix = (oldOptionReference) ? "%2b" : "";
+    var urlSymbol = (oldOptionReference) ? symbolPrefix + symbol.substring(1, symbol.length) : symbol;
+    var useLocalPage = false; //test if have function on page, but catch third party access denied errors
+    if (top.tdaHub) {
+        top.tdaHub.openAddToWatchlist(urlSymbol);
+    } else {
+        try {
+            lpath.tdaHub.openAddToWatchlist(urlSymbol);
+        } catch (e) {
+            lpath.top.tdaHub.openAddToWatchlist(urlSymbol);
+        }
+
+        if (chainpopup) {
+            window.close();
+        }
+    }
+}

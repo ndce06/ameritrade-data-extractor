@@ -1,0 +1,246 @@
+var agt = navigator.userAgent.toLowerCase(); 
+var navagt = navigator.userAgent.toLowerCase();
+var nav_is_mac = (navigator.appVersion.toLowerCase().indexOf("macintosh")!=-1);
+var nav_is_major = parseInt(navigator.appVersion);
+var nav_is_ie = (navagt.indexOf("msie")!=-1);
+var docHeight,mObj,mArrow,mCover,pageRef,isFramed;
+
+var holdmoreid = ""; 
+var moreLink = "morelink_"; var closeLink = "closelink"; var morePrefix = "more_";
+var openTitleText = "Click to open"; var closeTitleText = "Click to close";
+var moreSeperator = "`"; var moreWrap = "^"; var wrapClass = "class=wrap";
+var xPadding = 2;
+var resize_update=true;
+var savedoldresizefunction = null;
+function setMore(frameref){
+	var docref = (frameref) ? frameref : this.self;
+	docHeight = (nav_is_ie) ? docref.document.body.clientHeight : docref.outerHeight;
+	pageRef = (frameref) ? frameref.document : document;
+	mObj = pageRef.getElementById("displaymore");	
+	mArrow = pageRef.getElementById("displaymore_arrow");
+	mCover = (frameref) ? false : pageRef.getElementById("moreCover"); //initialize iframe for selects
+	if (frameref) isFramed = true; else initMoreResize();
+}
+
+function initMoreResize(){ //need to set resize onload to adjust more positioning when resized
+	if(resize_update){
+		if (window.onresize && window.onresize!=null){ savedoldresizefunction = window.onresize;}
+		else {savedoldresizefunction = function() {};}
+		window.onresize = doMoreResize;	 
+		resize_update=false;
+	}
+}
+
+function doMoreResize(){ //called when window is resized 
+    savedoldresizefunction();
+	if (mObj && mObj.style.display=="") calcMore(holdmoreid);
+}
+
+function showMoreTitle(mlinkobj){ //display open text on initial mouseover of more link
+	if (mlinkobj && mlinkobj.title=="") mlinkobj.title = openTitleText;
+}
+
+function showMoreDetails(rowid,symbol,details,titlebartext){
+	var closeRequest = handleMoreAction(rowid);
+	if (closeRequest) return false;  //close more div
+	var mimg = pageRef.getElementById(morePrefix + rowid);
+	var info = pageRef.getElementById("dynamicmore");
+	var formatdetails = "<table width='100%' class='p02' border='0'>";
+	var detailtitle,detailtext,title,text,seperator,titlewrap,textwrap,startstring;
+	var writeDetails = true;
+	
+	for (var i=0,dlen=details.length;i<dlen;i++){	
+		var detail = details[i];		 
+		if (detail == "divider") formatdetails += "<tr class='spacer'><td colspan='2'><div class='moredivider'></div></td></tr>";
+		else {
+			seperator = detail.indexOf(moreSeperator);
+			if (seperator>=0){
+				titlewrap = (detail.charAt(0)==moreWrap) ? wrapClass : "";
+				startstring = (titlewrap!="") ? 1 : 0;
+				detailtitle = detail.substring(startstring,seperator);
+				
+				textwrap = (detail.charAt(seperator+1)==moreWrap) ? wrapClass : "";
+				startstring = (textwrap!="") ? seperator+2 : seperator+1;
+				detailtext = detail.substring(startstring,detail.length);
+				
+				if (detailtext==""){ writeDetails = false; } //rewrite in correct format only if text is available
+				else{
+					title = "<tr><td " + titlewrap + " style='padding-right:6px'>" + detailtitle + "</td><td " + textwrap + " width='100%'>";
+					text =  detailtext + "</td></tr>";
+				}
+			}
+			else {
+				titlewrap = (detail.charAt(0)==moreWrap) ? wrapClass : "";
+				startstring = (titlewrap!="") ? 1 : 0;				
+				title = "<tr><td " + titlewrap;
+				if (detail.indexOf("footnote") != -1) {
+					title += " style='padding-right:6px' colspan='2' valign='middle'>";
+					text = detail.substring(startstring,detail.length);
+					text += "</td></tr>";
+				} else {					
+					title += " style='padding-right:6px' colspan='2' valign='middle'><ul class=\"morebulletUL\"><li class=\"morebulletLI\">";
+					text = detail.substring(startstring,detail.length);
+					text += "</li></ul></td></tr>";
+				}
+			}
+			if (writeDetails) formatdetails += title + text;
+			writeDetails = true;
+		}
+	}
+	formatdetails += "</table>";
+	info.innerHTML = formatdetails;
+	
+	var descbar = pageRef.getElementById("moreDesc");
+	descbar.innerHTML = titlebartext;
+
+	calcMore(rowid);
+}	
+
+function showMoreDetailsAjax(rowid,desc,symbol,snapBoxTopOverride,snapBoxLeftOverride){
+	var closeRequest = handleMoreAction(rowid);
+	if (closeRequest) return false;  //close more div
+	getQuote(symbol,false);  //call ajax function
+	var mimg = pageRef.getElementById(morePrefix + rowid);
+	var descbar = pageRef.getElementById("moreDesc");
+	descbar.innerHTML = desc;
+	calcMore(rowid,false,false,snapBoxTopOverride,snapBoxLeftOverride);
+}
+
+function handleMoreAction(moreid,closeATagId){
+	var samemoreid = (holdmoreid!=""&&holdmoreid==moreid);
+	var aTag = pageRef.getElementById(moreLink + moreid);
+	var closeATagName = (closeATagId) ? closeATagId : closeLink;
+	var closeATag = pageRef.getElementById(closeATagName);
+	var closeRequest = false; //set default to open more icon
+	if (mObj.style.display=="" && samemoreid) {hidemore(true); closeRequest=true;}
+	else if (closeATag) { 
+		closeATag.onclick = aTag.onclick;
+		if (mArrow) { mArrow.onclick = aTag.onclick; }
+		
+		if (closeATag.title=="") {
+			closeATag.title = closeTitleText;
+			if (mArrow) { mArrow.title = closeTitleText; }
+		}		
+	}
+	if (aTag) aTag.title = (closeRequest) ? openTitleText : closeTitleText; //change title desc
+	if (!samemoreid){
+		var oldaTag = pageRef.getElementById(moreLink + holdmoreid);
+		if (oldaTag) oldaTag.title = openTitleText; //change title desc
+	}
+	holdmoreid = moreid; 
+	return closeRequest; 
+}
+
+function calcMore(moreid,anchorPointYId,anchorOverflow,snapBoxTopOverride,snapBoxLeftOverride){
+	mObj.style.display =''; //** browser bug ** - you have to show the div so it will have offset values
+	if (mArrow) { mArrow.style.display = ''; }
+
+	var scrollTop = getScrollTop();  
+	var innerHeight = getInnerHeight();
+	var moreObjHeight = mObj.offsetHeight;		//get the height of the moreObj
+	var mimg = pageRef.getElementById(morePrefix+moreid);
+	var anchorPointRef = (anchorPointYId) ? anchorPointYId : morePrefix+moreid;
+	var anchorPointY;
+	if (anchorOverflow){
+		var anchorScrollTop = getScrollTopElement(anchorPointYId);
+		anchorPointY  = (anchorScrollTop>0) ? findPosY(morePrefix+moreid,pageRef) - anchorScrollTop : findPosY(morePrefix+moreid,pageRef);
+	}
+	else anchorPointY = findPosY(anchorPointRef,pageRef);	//get the y coord of the anchor point
+	
+	var removePadding = document.all ? 6 : 0;  //ie adds too much space
+	var heightPadding = mimg.offsetHeight - removePadding;
+
+	//figure out all the possible snap points
+	var snapBox = [];
+	snapBox["AboveY"] = (anchorPointY - moreObjHeight) + heightPadding;
+	snapBox["BelowYAlignTop"] = anchorPointY - removePadding;	
+	snapBox["MiddleY"] = scrollTop + innerHeight - moreObjHeight;
+	snapBox["BelowYAlignBottom"] =  anchorPointY + mimg.height + 4;
+ 
+	var goSnapBoxBelowY = (moreObjHeight+snapBox["BelowYAlignTop"]-scrollTop < innerHeight); //first choice
+	var goSnapBoxAboveY = (anchorPointY - moreObjHeight > scrollTop); //second choice
+
+	if (mObj){
+		mObj.style.left =  calcMoreLeft(moreid,snapBoxLeftOverride); //snap to x
+		var newtop;
+		if (snapBoxTopOverride) newtop = snapBox[snapBoxTopOverride];
+		else if (goSnapBoxBelowY) newtop = snapBox["BelowYAlignTop"];
+		else if (goSnapBoxAboveY) newtop = snapBox["AboveY"];
+		else newtop = snapBox["MiddleY"]; //snap to y
+		
+		mObj.style.top = (newtop - 1) + "px";
+		if (mArrow) { mArrow.style.top = (newtop - 17) + "px"; }
+		
+		hideSelects();
+	}
+}
+
+function calcMoreLeft(moreid,snapBoxLeftOverride){
+	var anchorPointX = findPosX(morePrefix+moreid,pageRef); //get the x coord of the anchor point
+	var mimg = pageRef.getElementById(morePrefix + moreid);
+	
+	var snapBox = [];
+	snapBox["Left"] = anchorPointX - mObj.offsetWidth - xPadding;
+	snapBox["Right"] = anchorPointX + mimg.offsetWidth + xPadding;	
+	snapBox["Middle"] = anchorPointX - mimg.offsetWidth - 65; 
+	snapBox["MiddleLeft"] = anchorPointX - mimg.offsetWidth - 250;
+		
+	var left = snapBox["Left"];
+	if (snapBoxLeftOverride) left = snapBox[snapBoxLeftOverride]; 
+	else if (left<0) left = snapBox["Right"]; //align to the right of more icon if can't fit to the left	
+	if (mArrow) { 
+		var mArrowLeft;
+		if (snapBoxLeftOverride=="MiddleLeft") mArrowLeft = (left + 240) + "px";
+		else mArrowLeft = (left + 55) + "px";
+		mArrow.style.left = mArrowLeft; 
+	}
+
+	return (left+"px");
+}
+
+function getScrollTop(doc){
+	doc = ( doc == null || doc == "undefined" ) ? pageRef : doc; //default to document if no doc is passed in.
+	if (doc.documentElement && doc.documentElement.scrollTop)	return doc.documentElement.scrollTop;  //IE 6
+	else if (doc.body) return doc.body.scrollTop; //IE 5.5
+	else return doc.pageYOffset; //Netscape & Others
+}
+function getScrollTopElement(id){
+	var element = document.getElementById(id);
+	if (element){
+		if (element.scrollTop) return element.scrollTop;
+		else if (element.pageYOffSet) return element.pageYOffset; //Netscape & Others
+		else return 0;
+	}
+}
+function getInnerHeight( ){
+	if (typeof( window.innerWidth ) == 'number') {	
+		myWidth = window.innerWidth; myHeight = window.innerHeight; //Non-IE
+	} else if (pageRef.documentElement && (pageRef.documentElement.clientWidth || pageRef.documentElement.clientHeight)) {
+		//IE 6+ in 'standards compliant mode'
+		myWidth = pageRef.documentElement.clientWidth; myHeight = pageRef.documentElement.clientHeight;
+	} else if (pageRef.body && (pageRef.body.clientWidth || pageRef.body.clientHeight)) {
+		//IE 4 compatible
+		myWidth = pageRef.body.clientWidth; myHeight = pageRef.body.clientHeight;
+	}
+	return myHeight;
+}
+
+function hidemore(hideIframe) {
+	if (mObj) mObj.style.display = "none";
+	if (mArrow) mArrow.style.display = "none";	
+	if (hideIframe && mCover) mCover.style.visibility = "hidden";
+}
+ 
+function hideSelects(){ //place iframe behind layer to cover select pulldowns
+	if (!nav_is_mac && nav_is_ie){ //select fix 
+		if (mCover){
+			mCover.style.top = mObj.style.top;
+			mCover.style.left = mObj.style.left;
+			mCover.style.width = mObj.offsetWidth;
+			mCover.style.height = mObj.offsetHeight;	
+			mCover.style.visibility = "visible";
+			mObj.style.display = "";
+			if (mArrow) mArrow.style.display = "";
+		}
+	}
+}

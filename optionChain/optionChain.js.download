@@ -1,0 +1,739 @@
+//scripts used with more.js
+var chainpopup=false; 
+var path,lpath;
+
+var gridSiteWin = top.opener.top.tdaHub.windowController.gridWindow;
+var pureGridPage = false;
+
+var oc_g2gMap = {
+	"/cgi-bin/apps/u/JaguarEnhancedEquityTrade" : "/grid/p/site#r=equityOrder",
+	"/cgi-bin/apps/u/JaguarEnhancedOptionTrade" : "/grid/p/site#r=optionOrder",
+	"/cgi-bin/apps/u/JaguarBuywriteTrade" : "/grid/p/site#r=coveredCall",
+	"/cgi-bin/apps/u/JaguarSpreadTrade?orderstring=strategy=VCS" : "/grid/p/site#r=verticalCallSpread",
+	"/cgi-bin/apps/u/JaguarSpreadTrade?orderstring=strategy=VPS" : "/grid/p/site#r=verticalPutSpread",
+	"/cgi-bin/apps/u/JaguarSpreadTrade?orderstring=strategy=CCS" : "/grid/p/site#r=calendarCallSpread",
+	"/cgi-bin/apps/u/JaguarSpreadTrade?orderstring=strategy=CPS" : "/grid/p/site#r=calendarPutSpread",
+	"verticalCallSpread" : "/grid/p/site#r=verticalCallSpread",
+	"verticalPutSpread" : "/grid/p/site#r=verticalPutSpread",
+	"calendarCallSpread" : "/grid/p/site#r=calendarCallSpread",
+	"calendarPutSpread" : "/grid/p/site#r=calendarPutSpread",
+	"/cgi-bin/apps/u/JaguarStraddleTrade" : "/grid/p/site#r=straddle",
+	"/cgi-bin/apps/u/JaguarStrangleTrade" : "/grid/p/site#r=strangle",
+	"/cgi-bin/apps/u/JaguarTradeTriggersTerms" : "/grid/p/site#r=contingentOrder"
+};
+var oc_g2gActionMap = {
+	"buy" : "BUY",
+	"sell" : "SELL",
+	"buytoopen" : "BUY_TO_OPEN",
+	"buytoclose" : "BUY_TO_CLOSE",
+	"selltoopen" : "SELL_TO_OPEN",
+	"selltoclose" : "SELL_TO_CLOSE"
+};
+
+function launchInGridSite(url, ocOpenerId) {
+
+	if (typeof tradeBeta !== 'undefined' && tradeBeta) {
+		var key, re = /strategy=(VCS|VPS|CCS|CPS)/;
+		var isSpreadTrade = url.match(re) || false;
+
+		if ( isSpreadTrade ) {
+			key = url.split("~")[0];
+		} else {
+			key = url.split("?")[0];
+		}
+		if(key === "/cgi-bin/apps/u/JaguarSpreadTrade" && path.ocId == "grdComplexOrder") {
+			key = gridSiteWin.location.hash.split("#r=")[1].split("?")[0];
+		}
+
+		var gridUrlFromMap = oc_g2gMap[key];
+		var currRegion = gridSiteWin.location.hash.split("#r=")[1].split("?")[0];
+
+		if (gridUrlFromMap) {
+			var targetRegion = gridUrlFromMap.split("#r=")[1];
+
+			var ocLinkData = JSON.parse('{"' + url.split('orderstring=')[1].replace(/=/g,'":"').replace(/~/g,'","') + '"}');
+
+			if((/calendarCallSpread|calendarPutSpread/).test(targetRegion) && ocLinkData.action2 && ocLinkData.symbol2) {
+				var action = ocLinkData.action,
+					action2 = ocLinkData.action2;
+				ocLinkData.action = action2;
+				ocLinkData.action2 = action;
+				var symbol = ocLinkData.symbol,
+					symbol2 = ocLinkData.symbol2;
+				ocLinkData.symbol = symbol2;
+				ocLinkData.symbol2 = symbol;
+				var symbolDesc = ocLinkData.symbolDesc,
+					symbolDesc2 = ocLinkData.symbolDesc2;
+				ocLinkData.symbolDesc = symbolDesc2;
+				ocLinkData.symbolDesc2 = symbolDesc;
+			}
+
+			ocLinkData.action = oc_g2gActionMap[ocLinkData.action];
+
+			if (!(/equityOrder|contingentOrder/).test(targetRegion)) {
+				var ocLeg1Obj = parseOptionSymbol(ocLinkData.symbol || "");
+				var ocLeg2Obj = parseOptionSymbol(ocLinkData.symbol2 || "", "2");
+				ocLinkData = mixinObj(ocLinkData, ocLeg1Obj);
+				ocLinkData = mixinObj(ocLinkData, ocLeg2Obj);
+
+				ocLinkData.action2 = ocLinkData.action2 ? oc_g2gActionMap[ocLinkData.action2] : "";
+			}
+		}
+
+		if (ocOpenerId && ((path.ocId == "grdOptionOrder" && /(optionOrder|contingentOrder|conditionalOrder)/.test(targetRegion)) || targetRegion === currRegion)) {
+
+			if(targetRegion === "coveredCall") {
+				ocLinkData.symbol = ocLinkData.symbol2;
+				ocLinkData.optionSymbol = ocLinkData.optionSymbol2;
+				ocLinkData.expiration = ocLinkData.expiration2;
+				ocLinkData.strike = ocLinkData.strike2;
+				ocLinkData.type = ocLinkData.type2;
+			}
+
+			gridSiteWin.tdaHub.populateOptionLeg(ocOpenerId, ocLinkData, document.chain.symbol.value);
+
+		} else {
+
+			if (gridUrlFromMap) {
+				var _data;
+
+				if (targetRegion === "equityOrder") {
+					_data = {
+						"symbol" : ocLinkData.symbol,
+						"orderAction" : ocLinkData.action
+					};
+				} else if (targetRegion === "optionOrder") {
+					_data = {
+						"underlyingSymbol" : document.chain.symbol.value || ocLinkData.underlyingSymbol,
+						"optionSymbol" : ocLinkData.symbol,
+						"orderAction" : ocLinkData.action,
+						"expiration" : ocLinkData.expiration,
+						"strike" : ocLinkData.strike,
+						"callPut" : ocLinkData.type
+					};
+				} else {
+					_data = {
+						"underlyingSymbol" : document.chain.symbol.value || ocLinkData.underlyingSymbol,
+						"optionSymbol1" : ocLinkData.symbol,
+						"orderAction1" : ocLinkData.action,
+						"expiration1" : ocLinkData.expiration,
+						"strike1" : ocLinkData.strike,
+						"callPut1" : ocLinkData.type,
+						"optionSymbol2" : ocLinkData.symbol2,
+						"expiration2" : ocLinkData.expiration2,
+						"strike2" : ocLinkData.strike2,
+						"callPut2" : ocLinkData.type2,
+						"orderType" : ocLinkData.ordtype,
+						"premium" : ocLinkData.price
+					};
+				}
+				
+				var params = "?" + JSON.stringify(_data).replace(/{|}|"|'/g,"").replace(/:/g,"=").replace(/,/g,"&");
+
+				gridSiteWin.location.href = gridUrlFromMap + params;
+
+			} else {
+				var gridUrl = "/grid/p/site#r=jPage" + url;
+
+				gridSiteWin.tdaHub.navigateTo(gridUrl);
+			}
+		}
+	} else {
+		// TODO: When we rewrite this into actual grid code, please FTLOG, use the appropriate topic publish!!
+		url = "/grid/p/site#r=jPage" + url;
+
+		// console.log("=== optionchain - launchInGridSite() - gridSiteWin:", gridSiteWin, " - url:", url);
+		gridSiteWin.tdaHub.navigateTo(url);
+	}
+}
+
+function parseOptionSymbol(optionSymbol, seq) {
+
+	var retObj = {};
+
+	if(typeof seq !== 'string') {
+		seq = "";
+	}
+
+	var re = new RegExp(/^(.+)([1-9]*)_(\d{2})(\d{2})(\d{2})(C|P)(.+)$/);
+	var arr = re.exec(optionSymbol);
+
+	if (arr && arr.length > 0) {
+		var currYearPrefix = new Date().getFullYear().toString().substr(0,2);
+		// var expirationDateString = new Date(arr[3]+"/"+arr[4]+"/"+ currYearPrefix +arr[5]).toDateString().replace(/^\w*./,'');
+
+		var mon = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+		var expirationDateString = mon[(arr[3]*1)-1] + " " + arr[4] + " " + currYearPrefix + arr[5] ;
+
+		var callPutMap = {
+			"C" : "CALL",
+			"P" : "PUT"
+		};
+
+		retObj["optionSymbol"+seq] = (arr[0] === optionSymbol) ? arr[0] : optionSymbol;
+		retObj["underlyingSymbol"] = arr[1],
+		retObj["nonStandardOption"+seq] = arr[2] ? "yes" : "no";
+		retObj["expiration"+seq] = expirationDateString;
+		retObj["type"+seq] = callPutMap[arr[6]];
+		retObj["strike"+seq] = arr[7];		
+	}
+
+	return retObj;
+}
+
+function launchInSnapticket(url) {
+	// console.log("=== optionchain - launchInSnapticket() - gridSiteWin:", gridSiteWin, " - url:", url);
+	gridSiteWin.tdaHub.legacySTChangeUrl(url);
+}
+
+function initMore() {
+	setMore();
+	initPath();
+	getDisplayState();
+}
+
+function initPath() {
+	/*	Rewritten for grid.
+		path is for the grid site window
+		lpath is for the "main" iframe within the grid site window, if it exist.
+	*/
+	if(chainpopup && top.opener) {
+
+		// Search for tdaHub:
+		if(top.opener.top.tdaHub) {
+			// This works for most scenario (jPage, Snapticket, vendorLinks iframe)
+			path = top.opener.top.tdaHub.windowController.gridWindow;
+			
+			// Find the "main" iframe
+			if(path.main) {
+				lpath = path.main;
+
+			} else {
+				// Pure grid page:
+				pureGridPage = true;
+				lpath = path;
+			}
+
+		} else {
+			// Do we need to worry about option chain window opening from a non-tdaHub popups?
+			console.warn("===> optionchain - Option Chain window opened from non-tdaHub popup.");
+		}
+
+	} else { 
+		// Looks like the main window is missing.
+		path = false;  
+		lpath = false; 
+	}
+	// console.log("===> optionchain - initPath() - path:", path, "- lpath:", lpath);
+}
+
+var listWindow = null; 
+var tradeFinderWindow = null;
+var cMsg = "You can not access this selection because you have closed your main browser window.";
+var ORDERTICKET = new Array("SINGLE","BUYWRITE","SPREAD","STRADDLE","STRANGLE");
+
+function popList() {
+	if (listWindow) {
+		if (listWindow.closed) {
+			listWindow = window.open('/cgi-bin/apps/u/PLoad?pagename=quotes/indexList.html','list','width=394,height=455,resizable=1,status=1,scrollbars=1');
+		}
+	} else {
+		listWindow = window.open('/cgi-bin/apps/u/PLoad?pagename=quotes/indexList.html','list','width=394,height=455,resizable=1,status=1,scrollbars=1');
+	}
+	listWindow.focus();
+}
+
+function viewQuote(symbol) {
+	path.viewQuote(symbol);
+	if (chainpopup){
+		window.close();
+	}
+}
+
+function populateLeg(origin,tabid,leg,symbol,desc,odddel,price,linkref) {		
+	var form = document.chain;
+	var ocOpenerId = form.ocOpenerId ? form.ocOpenerId.value : null;
+	var popupOpenerClosed = (chainpopup && !path);
+	if (popupOpenerClosed) { alert(cMsg); window.close();}
+
+	if ((linkref!="buy" && linkref!="sell") && (price == "0.00" || !price)){
+		alert("Zero cost spreads currently must be placed through a broker. You may also click the ask price to populate the trade ticket but remember to adjust the order accordingly.")
+		return false;
+	}
+	
+	var typeval = form.type.options[form.type.selectedIndex].value;
+	var simpleQuotes = (typeval=="CP" || typeval=="C" || typeval=="P" || typeval=="A");
+	
+	if (origin!="" && simpleQuotes){
+		var pageId = "";
+		try {
+			pageId = (chainpopup) ?  lpath.ocId : "";
+		} catch(e) {}
+	
+		switch (origin){ //user was on page, but then changed
+			case "singleorder":
+						var pageMatch = (!popupOpenerClosed) ? true : false;  //if popup, assume user is still on same target page until proven otherwise
+						if (pageId!="single") {
+							pageMatch = false;
+							populateDefaultSnap(symbol,desc,odddel,price,linkref);
+						}
+						if (chainpopup && pageMatch && lpath && lpath.populateLeg){
+							lpath.populateLeg(origin,tabid,leg,symbol,desc,odddel,price,linkref);
+						}
+						break;
+			case "triggeralert":
+			case "triggerorder":
+						setTriggerOption(origin,symbol,desc,odddel,price,linkref);
+						break;
+		} 
+	}
+	else {
+		if (tabid != "" ||
+			(typeof ocOpenerId === "string" && ocOpenerId !== "" && tabid !== "")
+		) {
+			var useLocalPage = false; //test if have function on page, but catch third party access denied errors
+			
+			try {
+				useLocalPage = (chainpopup && lpath && lpath.populateLeg && lpath.document.temp && lpath.document.temp.tabid.value == tabid);
+			} catch(e) {}
+
+			if (useLocalPage){
+				var localSpreadPage=false; //spread ticket, to be able to switch inner tabs
+				if (useLocalPage && lpath.complexOptionTicketSpread && !simpleQuotes && typeval != lpath.document.temp.strategy.value) {
+						localSpreadPage=true;
+						leg="symbol";
+				}			
+				lpath.populateLeg(origin,tabid,leg,symbol,desc,odddel,price,linkref);
+				if (localSpreadPage){
+						lpath.toggleStrategy(typeval);
+						lpath.determinePosition();
+				}
+			}
+			else if (lpath) { //dynamic buy,sell links for complex order tickets
+				var cUrl = "", cc;
+				if(typeof tradeBeta !== 'undefined' && tradeBeta && simpleQuotes) {
+					cc = false;
+				} else {
+					cc = (tabid==1);
+				}
+				var params = "";
+				if (linkref=="bid" || linkref=="sell"){
+					 params += (cc) ? "action=buy~action2=selltoopen~" : "action=selltoopen~";
+				}
+				else if (linkref=="buy" || linkref=="ask"){
+					params += (cc) ? "action=sell~action2=buytoclose~" : "action=buytoopen~";
+				}
+				if (linkref=="bid" || linkref=="ask") {
+					params += "price="+price + "~";
+				}
+				var legId = (cc) ? "2" : ""; //target first leg except for cc
+
+				if(typeof tradeBeta !== 'undefined' && tradeBeta && simpleQuotes && typeof ocOpenerId === "string" && ocOpenerId !== "" && tabid !== 0) {
+					tabid = 0;
+				} 
+
+				params += "symbol"+legId+"="+symbol+"~symbolDesc"+legId+"="+desc+"~symbolOddDeliverable"+legId+"="+odddel;
+				switch(tabid){
+					case 0:
+							cUrl = "/cgi-bin/apps/u/JaguarEnhancedOptionTrade?orderstring="+params;
+							break;
+					case 1:
+							cUrl = "/cgi-bin/apps/u/JaguarBuywriteTrade?orderstring="+params;
+							break;
+					case 2:
+							cUrl = "/cgi-bin/apps/u/JaguarSpreadTrade?orderstring=strategy="+document.chain.type.value+"~"+params;
+							break;
+					case 3:
+							cUrl = "/cgi-bin/apps/u/JaguarStraddleTrade?orderstring="+params;
+							break;
+					case 4:
+							cUrl = "/cgi-bin/apps/u/JaguarStrangleTrade?orderstring="+params;
+							break;
+				}
+				if (tabid == 5) {
+					populateDefaultSnap(symbol,desc,odddel,price,linkref);
+				}
+				else if (cUrl !== "") {
+
+					// lpath.location.href = cUrl;
+					launchInGridSite(cUrl, ocOpenerId);
+				}
+			
+			}
+		}
+		else {
+			populateDefaultSnap(symbol,desc,odddel,price,linkref);
+		}
+	}
+	
+	// console.log("===> optionchain - populateLeg() - tabid: %s - cUrl: %s", tabid, cUrl, "- lapth:", lpath);
+
+	if (chainpopup) {
+		window.close();
+	}
+}
+
+function populateDefaultSnap(symbol,desc,odddel,price,linkref){
+	var nosnap = false; // In grid, if you can pull up option chain, snapticket exist // (path && !path.snap);  
+
+	var bidask = "";
+	if (symbol.charAt(0)== "+") {
+		symbol= "%2b" + symbol.substring(1,symbol.length);
+	}
+	
+	var params = "";
+	if (nosnap) {
+		params +=  "symbol=" + symbol + "~symbolDesc=" + desc + "~symbolOddDeliverable=" + odddel + "~";
+	}
+	
+	var startUrl = "";
+	var isDetached = (path.detach && path.popSnap != null && !path.popSnap.closed);
+	
+	//if (linkref != "buy" || linkref != "sell") params += "price=" + price + "~";
+	
+	if (linkref == "bid" || linkref == "sell") {
+		bidask = "bid";
+	}
+	else if (linkref == "ask" || linkref == "buy") {
+		bidask = "ask";
+	}
+
+	if (nosnap){
+		params += "~ordticket=standard~totlegs=1";
+		startUrl = "/cgi-bin/apps/u/JaguarEnhancedOptionTrade?orderstring=";
+		// lpath.location.href = startUrl+params;
+		launchInGridSite(startUrl+params, document.chain.ocOpenerId ? document.chain.ocOpenerId.value : null);
+	}
+	else {
+		startUrl = "/cgi-bin/apps/u/OptionTrade?symbol=" + symbol + "&bidask=" + bidask + "&snapid=snap&priceLocked=true";
+		// path.snapticket.location.href = startUrl+params;
+
+		launchInSnapticket(startUrl+params);
+	}
+}
+ 
+function populateTicket(tabid,urlString) {
+	var querySubstr = urlString;
+	var price;
+	var str = urlString.split("~");
+	var splitStr = new Array;
+	
+	for (i=0; i<str.length; i++){ 
+		splitStr[i] = str[i].split("="); 
+		if (splitStr[i][0] == "price") {
+			price = splitStr[i][1];
+		}
+	} 
+	 
+	if(price == "0.00" || !price){
+		alert("Zero cost spreads currently must be placed through a broker. You may also click the ask price to populate the trade ticket but remember to adjust the order accordingly.");
+		return false;
+	}
+
+	/* Not completely clear why we're doing all these checks but seems like the main purpose is to load the order ticket page on the right window.  We should be using launchInGridSite() instead.
+	if (chainpopup){
+		var useLocalPage = true; //test if have function on page, but catch third party access denied errors
+		try {
+			if (!lpath.document.temp || !lpath.document.temp.tabid || (lpath.document.temp.tabid.value != tabid)) lpath.location.href = querySubstr;
+			else if (lpath.populateTicket) lpath.populateTicket(ORDERTICKET[tabid],querySubstr);
+			else lpath.location.href = querySubstr;
+		} catch(e) {useLocalPage = false;}
+		
+		if (!useLocalPage) lpath.location.href = querySubstr;
+
+		window.close();
+	} else document.location.href = querySubstr;
+	*/
+
+	// We're going to assume that now all populateTicket requets are going to the main grid window
+	launchInGridSite(querySubstr, document.chain.ocOpenerId ? document.chain.ocOpenerId.value : null);
+
+	window.close();
+}
+	
+function changeRange(opt){
+	var opt = opt;
+	document.chain.range.length = 0;
+	
+	if(opt == "check"){
+		opt = document.chain.type.options[document.chain.type.selectedIndex].value;
+	}			
+	if(opt == "STDL" || opt == "STGL"){
+		for(i=0; i<3; i++){
+			var newOpt = new Option(arrRangeText2[i][0],arrRangeText2[i][1],false,arrRangeText2[i][2])
+			document.chain.range.options[document.chain.range.length] = newOpt;
+		}
+	}
+	else {
+		for(i=0; i<4; i++){
+			var newOpt = new Option(arrRangeText1[i][0],arrRangeText1[i][1],false,arrRangeText1[i][2])
+			document.chain.range.options[document.chain.range.length] = newOpt;
+		}
+	}
+}		
+
+var scount=0;
+function submitForm(btn,newinterval){
+	var form = document.chain;
+	var ocOpenerId = form.ocOpenerId ? form.ocOpenerId.value : null;
+	var type = form.type;
+	var pageId = "";
+	try {
+		pageId = lpath.ocId;
+	} catch(e) {}
+	
+	scount++;
+	if (type.value == "A") { 
+		form.pagehandler.value = "PHAnalyticalOptionChain";
+		form.action = analyAction;
+	} else {
+		form.pagehandler.value = "PHOptionChain";
+		form.action = standardAction;
+	}
+	if (newinterval) {
+		form.interval.value = newinterval;
+	}
+	if (btn) {
+		form.buttonpressed.value = btn;
+	}
+	
+	//if user previews a dif complex menu option while on a ticket, and then goes back to simple, you have to target same ticket.	
+	if (pageId=="single" ||
+		(typeof tradeBeta !== 'undefined' && tradeBeta && typeof ocOpenerId === "string" && ocOpenerId !== "" && pageId == "grdOptionOrder")) {
+		form.tabid.value = 0;  //single ticket
+	}
+	else { //complex ticket?
+		var useLocalTabId = false; //test if have function on page, but catch third party access denied errors
+		try {
+			useLocalTabId = (chainpopup && lpath && lpath.populateLeg && lpath.document.temp && lpath.document.temp.tabid.value);
+		} catch(e) {}
+
+		if (useLocalTabId) {
+			form.tabid.value = lpath.document.temp.tabid.value; 
+		}
+		else if (chainpopup && typeof tradeBeta !== 'undefined' && tradeBeta && typeof ocOpenerId === "string" && ocOpenerId !== "" && pageId == "grdComplexOrder") {
+			form.tabid.value = form.tabid.value;
+		} else {
+			form.tabid.value = "";
+		}
+	}
+	
+	if (scount==1) {
+		form.submit();
+	}
+	else {
+		return false;
+	}
+}
+
+function restoreDefaults() {
+	var form = document.chain;
+	form.pagehandler.value = "PHAnalyticalOptionChain";
+	form.action = analyAction;
+	form.restoredefaults.value = "true";
+	form.submit();
+}
+
+var expiremonths,expiremonthvals;
+var expireall = ["All"]; var expireallvals = ["A"];
+function setExpire(){
+	//kill extra spacing due to bad loop
+	expiremonthstr = expiremonthstr.substring(0,expiremonthstr.length-1); 
+	expiremonthvalstr = expiremonthvalstr.substring(0,expiremonthvalstr.length-1); 
+	expiremonths = expiremonthstr.split(",");	expiremonthvals = expiremonthvalstr.split(",");	
+}
+
+function checkExpire(init){	
+	var form = document.chain;
+	var expire = form.expire;  		
+	var typeval = form.type.options[form.type.selectedIndex].value;
+	var currentval = expire.options[expire.selectedIndex].value;
+	var expiremenu = []; var expiremenuval = []; 
+	
+	if (typeval=="CP" || typeval=="C" || typeval=="P" || typeval=="A") {expiremenu = ["Weeklys"]; expiremenuval=["W"];}
+	expiremenu = expiremenu.concat(expiremonths); expiremenuval = expiremenuval.concat(expiremonthvals);
+	if (typeval!="A"){ expiremenu = expiremenu.concat(expireall); expiremenuval = expiremenuval.concat(expireallvals);}
+	if (!init) {//make first month default if weekly is first option unless user selected it
+		var resetcurrentval = true;
+		for (var i=0;i<=expiremenuval.length;i++){
+			if (currentval==expiremenuval[i]) {resetcurrentval = false; break;}
+		}
+		if (resetcurrentval) {currentval = expiremonthvals[0];}
+	 }
+	updateMenu(expire,expiremenu,expiremenuval,currentval);
+}
+		
+function updateMenu(menuobj,moptions,mvalues,mselected)
+{
+	var setmselected = false;
+	for (var i=menuobj.options.length - 1; i > 0; i--) { menuobj.options[i] = null; }
+	for (var i=0;i<moptions.length;i++) { 
+		menuobj.options[i] = new Option(moptions[i],mvalues[i]);
+		if (mvalues[i] == mselected) {
+			menuobj.selectedIndex = i;
+			menuobj.options[i].defaultSelected = true;
+			setmselected = true;
+		}
+	 }
+	if (!setmselected){
+		menuobj.selectedIndex = 0;
+		menuobj.options[0].defaultSelected = true;
+	}
+}
+
+function setTriggerOption(origin,symbol,desc,odddel,price,linkref) {
+	if (chainpopup && !path) { alert(cMsg);}
+	else{
+		var pageId = "";
+		try {
+			pageId = lpath.ocId;	
+		} catch(e) {}
+		
+		var pageMatch = (pageId=="triggers" && (origin=="triggeralert" || origin=="triggerorder")); //user is still on same target page
+		if (pageMatch){ //only pass underlying if already on triggers page
+			lpath.setTriggerOption(origin,symbol,desc,odddel,document.chain.symbol.value,price,linkref);
+		}
+		else {
+			var orderparams,
+				url = "/cgi-bin/apps/u/JaguarTradeTriggersTerms";
+
+			if(typeof tradeBeta !== 'undefined' && tradeBeta) {
+				orderparams = oc_g2gMap[url] + "?actionSymbol=" + symbol + "&actionType=option";
+			} else {
+				orderparams = url + "?trigger_symbol=" + symbol + "&trigger_symbol_desc=" + desc + "&trigger_symbol_odd_delivery=" + odddel + "&trigger_type=option";
+			}
+			if (origin=="triggerorder") {
+				if(typeof tradeBeta !== 'undefined' && tradeBeta) {
+					path.location.href = orderparams;
+				} else {
+					lpath.location.href = orderparams;
+				}
+			} else {
+				if(typeof tradeBeta !== 'undefined' && tradeBeta) {
+					path.location.href = orderparams + "&triggerSymbol=" + symbol + "&triggerType=option"; //pass both alert and order
+				} else {
+					lpath.location.href = orderparams + "&alert_type=option&alert_symbol=" + symbol + "&alert_symbol_desc=" + desc + "&alert_symbol_odd_delivery=" + odddel; //pass both alert and order
+				}
+			}
+		}
+	}
+	if (chainpopup) {
+		window.close(); 
+	}
+}
+
+var closedMsg = "You can not access this selection because you have closed your main browser window.";
+
+function bidAsk(symbol,price,linkref) {
+	var pageurl = "/cgi-bin/apps/u/JaguarEnhancedEquityTrade",
+		snapurl = "/cgi-bin/apps/u/EquityTrade";
+
+	if(typeof tradeBeta !== 'undefined' && tradeBeta) {
+		pageurl = oc_g2gMap[pageurl];
+	} else {
+		pageurl = pageurl + "?symbol=" + symbol + "&orderstring=ordticket=standard~totlegs=1~symbol=" + symbol + "~price=" + price + "~ordtype=limit" +linkref;
+	}
+	//pageurl = "/cgi-bin/apps/u/EnhancedEquityTrade?symbol=" + symbol + "&orderstring=ordticket=standard~totlegs=1~symbol=" + symbol + "~price=" + price + "~ordtype=limit" +linkref;
+
+	snapurl = snapurl + "?symbol=" + symbol + "&priceLocked=true&orderstring=symbol=" + symbol + "~ordtype=limit~price=" + price + linkref + "&snapid=snap";
+	if (path.snap || path.detach){ //target snapticket
+		changeUrl(snapurl);
+	}
+	else if (chainpopup && path && !path.closed) {
+		changeUrl(false,pageurl);
+	}
+	else {
+		alert(closedMsg);
+	}
+	if (chainpopup) {
+		window.close();
+	}
+}
+
+function changeUrl(snapurl,pageurl) { // checks to see if snapticket is attached or detached
+	if (path && !path.closed && !path.snap && pageurl!="") { //on a page without snapticket
+		if(typeof tradeBeta !== 'undefined' && tradeBeta) {
+			path.location.href = pageurl;
+		} else {
+			lpath.location.href = pageurl;
+		}
+	}
+	else if ((!chainpopup && path) || (chainpopup && path && !path.closed)) { //target snapticket
+		path.hState = true;
+		if (path.detach) {
+			if (path.popSnap != null && !path.popSnap.closed) {
+				path.popSnap.winClose = false;
+				path.popSnap.location.href = snapurl;
+				path.popSnap.focus();
+			}
+		} else {
+			path.minMax(true);
+			path.snapticket.location.href = snapurl;
+		}
+	}
+	else {
+		alert(closedMsg);
+	}
+}
+
+function showReport(){ //have to load this onload not inline b/c slowness breaks javascript
+	document.getElementById("optionsReport").src = reportUrl; 
+}
+
+var cookieName = "optionchainview";
+var displayCookieVal = "";
+function toggleDisplayState(init){
+	displayall = !displayall;
+	var togTxt = (displayall) ? "Collapse all expirations" : "Expand all expirations";
+	hidemore(true);
+	$('#toggleDisplay').html(togTxt); 
+	$(".ocTable tbody.allowhilite tr.headerRow").each(function(){
+		toggleSection(this,true);
+	});
+	var view = (displayall) ? "all" : "none";
+	if (!init) {
+		saveDisplayState(view);
+	}
+}
+
+function getDisplayState(){
+	var view = path.GetCookie(cookieName);
+	//alert('loading = ' + view);
+	displayCookieVal = view;
+	if (view){ //if has defined cookie
+		if (view=="all") { //expand all
+			toggleDisplayState(true);
+		}
+		else if (view!="none"){ //open specific if available
+			var expRows = displayCookieVal.split(",");
+			var expRow;
+			for (var i=0;i<expRows.length;i++){
+				expRow = document.getElementById("header"+expRows[i]);
+				if (expRow) {
+					toggleSection(expRow,false);
+				}
+			}
+		}
+	}
+}
+
+function setCustomDisplayState(){
+	var expiration = "";
+	var expRows =  $("div.expanded");
+	expRows.each(function(){
+		expiration += this.id + ",";
+	});
+	if (expiration != "") {
+		expiration = expiration.substring(0,expiration.length-1);
+	} else {
+		expiration = "none";
+	}
+	saveDisplayState(expiration);
+}
+
+function saveDisplayState(view){
+	//alert('saving = ' + view);
+	var today = new Date();
+	var expDate = new Date(today.getTime() + 1000 * 60 * 60 * 24 * (365*75)); //75 yrs from today
+	path.SetCookie(cookieName,view,expDate,"/",null,true);
+}

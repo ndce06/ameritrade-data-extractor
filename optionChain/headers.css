@@ -1,0 +1,174 @@
+/* new headers */
+div.h0headers { height:18px; font-size:12px; font-family:arial; font-weight:bold; padding-left:10px; margin-top:-1px; }
+div.h0headers span.normal { font-size:12px; font-family:arial; font-weight:bold; color:#fff; }
+div.h0headers a { font-weight:bold; }
+div.rtop div { height:1px; font-size:1px; line-height:1px; }
+div.r1 { border-left:5px solid #fff; margin:0px; }
+div.r2 { border-left:3px solid #fff; margin:0px; }
+div.r3 { border-left:2px solid #fff; margin:0px; }
+div.r4 { border-left:1px solid #fff; margin:0px; }
+
+/* old headers - pre TDAMTD*/
+.h01a, .h01aw, .h01b, .h01c, .h01e, .h01g, .h03,.h04,.h04b ,.h05{ font-weight:bold; }
+.h01a td, .h01b td, .h01c td, .h01e td, .h01f td, .h01g td, .h02 td, .h03 td ,.h04 td,.h04b td ,.h05 td{ height:21px; font-size: 9px; white-space:nowrap; }
+.h01a a, .h01aw a, .h01b a, .h01c a, .h03 a ,.h04 a ,.h05{ font-weight:normal; }
+.h01a .normalText, .h01f .normalText ,.h04 .normalText,.h04b .normalText ,.h05 .normalText{ font-weight:normal; }
+
+/* differences */
+/* main header */
+/* prevents the css buttons in non-IE browsers from hanging over the header area */
+.h01a td:last-child { padding-right: 2px; }
+.h01a { width: 100%; color:#000; background-color:#fff; }
+.h01a a, .h01a a.tooltip { color:#fff; }
+.h01a a.tooltip { display: block; font-size: 9px; margin-right:10px; padding: 3px; white-space: nowrap; }
+.h01a a.tooltip:hover, .h01a a.tooltipOn {background: #FFE4AF; border-bottom: none; color: #000; display: block; font-weight: bold; font-size: 9px; margin: 0 10px 0 3px; padding: 3px; text-decoration: none; white-space: nowrap;}
+.bottomWhite{border-bottom: 2px solid #fff;}
+a.h0Links { font-weight: bold; font-size: 9px; margin-right:10px; }
+.h01a .newWindow{padding: 3px 10px 0 0;}
+
+.h01aw { color:#fff; background-color:#006939; font:bold 12px Arial }
+.h01aw a { color:#003366; }  /*same as .h01a but this one wraps */
+
+/* subheaders */
+.h01b { width:100%; color:#fff; background-color:#0D9023; }
+.h01b a { color:#fff; }
+
+.h01c { color:#d98200; background-color:#FFF9E0; border:1px solid #FF9900; }
+.h01c a { color:#d98200; }
+
+/*new gray submodule style*/
+.h05 { width:100%; background-color:#E5E5E3;}
+
+
+/* security center */
+.h01d { color:#d98200; background-color:#FFF7D2; border:1px solid #FF9900; }
+
+/* review orders */
+.h01e { width:100%; color:#d98200; background-color:#FFF9E0; }
+
+/* customize homepage */
+.h01g { width:100%; color:#003366; background-color:#F0F0F0; }
+
+.h02 { color:#003366; font-size:11px; }
+.dh02Tabs { position:absolute; width:270px; top:6px; left:96px; }
+.dh02TabsBalancePositions { position:absolute; width:270px; top:6px; left:96px; }
+.dh02aTabs {position:absolute; width:270px; top:6px; left:24px;}
+.h02 tr.text td { padding-left:1px; padding-right:4px; vertical-align:middle; border-style:none;}
+.h02 td.selectedText { padding-left:1px; padding-right:4px; border-style:none; vertical-align:middle; }
+.h02 td { vertical-align:top; }
+.h02 a { text-decoration:none; }
+.h02 .selected { background-color:#fff; border-style:none; }
+.h02 .border { background-color:#003366; border-style:none; }
+
+
+
+/* stand alone tabs */
+table.standAloneTabs td{vertical-align: bottom;}
+table.standAloneTabs .tabTop, table.standAloneTabs .tabTopOn {height: 1px; font-size:1px; line-height:1px; margin:0px 3px 0px 3px;}
+table.standAloneTabs .tabTop { border-bottom:solid 1px #999;}
+table.standAloneTabs .tabTopOn { border-bottom:solid 1px #000;}
+
+table.standAloneTabs .tabSecond, table.standAloneTabs .tabSecondOn {height: 1px; font-size:1px; line-height:1px; margin:0px 2px 0px 2px; }
+table.standAloneTabs .tabSecond { background-color:#F5F5F5;  border-left:solid 1px #999; border-right:solid 1px #999;}
+table.standAloneTabs .tabSecondOn { background-color:#FFF; border-left:solid 1px #000; border-right:solid 1px #000;}
+
+table.standAloneTabs .tabThird, table.standAloneTabs .tabThirdOn {height: 1px; font-size:1px; line-height:1px; margin:0px 1px 0px 1px; }
+table.standAloneTabs .tabThird { background-color:#F5F5F5;  border-left:solid 1px #999; border-right:solid 1px #999;}
+table.standAloneTabs .tabThirdOn { background-color:#FFF; border-left:solid 1px #000; border-right:solid 1px #000;}
+
+table.standAloneTabs div.tabText, table.standAloneTabs div.tabTextOn {font:bold 12px arial; color:#000; min-width: 70px; text-align:center; white-space:nowrap; }
+table.standAloneTabs div.tabText { background-color:#F5F5F5; border-left:solid 1px #999; border-right:solid 1px #999; border-bottom: solid 1px #999;}
+table.standAloneTabs div.tabTextOn { background-color:#fff; border-bottom:solid 1px #fff; border-left:solid 1px #000; border-right:solid 1px #000;}
+table.standAloneTabs div.tabText a { color:#3366CC; display: block; text-decoration:none; padding:1px 8px 3px 8px;}
+table.standAloneTabs div.tabText a:hover { color: #000; background: #FFE4AF; display: block; text-decoration:none; padding:1px 8px 3px 8px;}
+table.standAloneTabs div.tabTextOn a { color:#000; display: block; padding:2px 8px 3px 8px; text-decoration:none; }
+table.standAloneTabs div.tabTextOn a:hover { background: none; color:#000; display: block; padding:2px 8px 3px 8px; text-decoration:none; }
+
+table.standAloneTabs div.tabTextRefresh, table.standAloneTabs div.tabTextOnRefresh{font-size:12px; padding:0px; color:#000;text-align:center; white-space:nowrap;}
+table.standAloneTabs div.tabTextRefresh{background-color:#FDFDFD;border:1px solid #CFCFCF; padding:6px 8px;}
+table.standAloneTabs div.tabTextOnRefresh{background-color:#fff;border:1px solid #CFCFCF; border-bottom:solid 1px #fff; padding:6px 8px;}
+table.standAloneTabs div.tabTextRefresh a, table.standAloneTabs div.tabTextOnRefresh a{color:#333; display: inline-block; text-decoration:none;font-weight: bold !important;}
+table.standAloneTabs div.tabTextRefresh a:hover, table.standAloneTabs div.tabTextOnRefresh a:hover{color:#000!important;text-decoration:underline;}
+table.standAloneTabs div.tabTextOnRefresh a{color: #000;}
+table.standAloneTabs div.tabTextOnRefresh a:hover{background: none; color: #000;text-decoration:none;}
+table.standAloneTabs div.tabTextOnRefresh div.refreshActive{border-left:none; display:inline; height:11px; margin: 0 0 0 5px; padding: 0 0 0 5px;}
+table.standAloneTabs div.tabTextOnRefresh div.refreshActive a:hover{background: none;}
+table.standAloneTabs div.tabTextRefresh div.refreshInactive{border-left:none; display:inline; height:11px; margin: 0 0 0 5px; padding: 0 0 0 5px;}
+table.standAloneTabs div.tabTextRefresh div.refreshInactive a:hover{background: none;}
+
+table.standAloneTabs td.tabSpacer { vertical-align:bottom; }
+table.standAloneTabs td.tabSpacer div { width:4px; border-bottom:solid 1px #999; vertical-align:bottom; }
+/* end stand alone tabs */
+
+table.secondaryTab{width:100%;margin-top:4px;border-bottom:solid 1px #999;}
+table.secondaryTab td {font:bold 11px arial;white-space:nowrap;padding-bottom:4px;}
+table.secondaryTab td.sep { padding:0 6px 4px 6px;}
+
+/* tabs within headers */
+.dh02Tabs {position:absolute; width:auto; top:0px;}
+div.dh02Tabs div.rtop div{height: 1px; line-height: 1px; font-size: 1px; overflow: hidden;}
+div.dh02Tabs div.r1{margin: 2px 5px 0px 5px;}
+* html div.dh02Tabs div.r1{margin: 2px 5px -1px 5px;}
+div.dh02Tabs div.r2{margin: 0px 3px 0px 3px;}
+div.dh02Tabs div.r3{margin: 0px 2px 0px 2px;}
+div.dh02Tabs div.rtop div.r4{margin: 0px 1px 0px 1px;}
+div.dh02Tabs td div.rtop div{background: #F5F5F5; border-left: 1px solid #999; border-right: 1px solid #999;}
+
+div.tabText{border-top: none; border-bottom: 1px solid #999;}
+div.dh02Tabs td.selectedText div.tabText{border-bottom: 1px solid #fff;}
+
+div.dh02Tabs td div.tabText{height:12px;background-color: #F5F5F5; border-left: 1px #999 solid; border-right: 1px #999 solid; font: bold 12px arial; line-height: 12px; margin: -1px 0 0 0; padding: 0 5px 3px 5px;}
+* html div.dh02Tabs td div.tabText{height:16px; background-color: #F5F5F5; border-left: 1px #999 solid; border-right: 1px #999 solid; font: bold 12px arial; line-height: 12px; margin: -1px 0 0 0; padding: 0 5px 1px 5px;}
+div.dh02Tabs td div.tabText a, div.dh02Tabs td div.tabText a:visited{font: bold 12px arial; line-height: 12px; color: #0158C4; background: #F5F5F5; text-decoration:none; padding: 0;}
+div.dh02Tabs td div.tabText a:hover{color: #000; background-color: #FFE4AF;}
+
+div.dh02Tabs td.selectedText{padding-top: 0 !important;}
+div.dh02Tabs td.selectedText div.r1{border-top: 1px #000 solid; margin: 1px 5px 0px 5px;}
+div.dh02Tabs td.selectedText div.rtop div{background: #fff; border-left: 1px #000 solid; border-right: 1px #000 solid;}
+div.dh02Tabs td.selectedText div.tabText{background-color: #fff; border-left: 1px #000 solid; border-right: 1px #000 solid; color: #000; line-height: 12px; margin: -1px 0 0 0; padding: 0 5px 3px 5px;}
+* html div.dh02Tabs td.selectedText div.tabText{padding: 0 5px 1px 5px;}
+
+div.refreshHeaderIcon { border-left:1px #fff solid; display:inline; margin:2px 0 0 5px; padding:0 0 0 5px;}
+/* double white pipes to the left and right of refresh */
+div.refreshHeaderIcon2 { border-left:1px #fff solid; border-right:1px #fff solid; display:inline; margin:2px 10px 0 5px; padding:0 5px 0 5px;}
+div.refreshHeaderIcon3 { border-left:1px #000000 solid; display:inline; margin:2px 0 0 5px; padding:0 0 0 5px;}
+* html div.refreshHeaderIcon2 { margin:2px 0 0 5px; padding:0 5px 0 5px;}
+div.refreshActive { border-left:1px #666 solid; display:inline; height:11px; margin:0 0 0 5px; padding:0 0 0 5px;}
+div.refreshActive img{padding: 1px 0 0 0;}
+* html div.refreshActive img{padding: 0 0 0 0;}
+div.refreshInactive { border-left:1px #666 solid; display:inline; height:11px; margin:0 0 0 5px; padding:0 0 0 5px;}
+div.refreshInactive img{padding: 1px 0 0 0;}
+* html div.refreshInactive img{padding: 0 0 0 0;}
+div.newIcon { display:inline; height:11px; margin:1px 0 0 6px;}
+/*IE needs this for the tabs with no refresh icon*/
+div.refreshNone{display:inline; font-size: 1px; line-height: 1px; height:11px; margin:0; padding:0;}
+/* end tabs within headers */
+
+/* headers with blue text and grey line */
+.h03 { color:#3399CC; }
+.h03 a { color:#3399CC; }
+.h03 .bottom { border-bottom:1px solid #ccc; }
+.h03 .bluebottom { border-bottom:1px solid #6699cc; }
+.h03 .left { height:13px; border-left:1px solid #ccc; }
+.h03 .blueleft { height:13px; border-left:1px solid #6699cc; } 
+
+/* random */
+.h01a .morestandard { background-color:#BCD1F3; }
+.h01a .morecancel { background-color:#FFDFAE; }
+.h01a .morereplace { background-color:#E0DAF5; }
+.h01abackground { background-color:#bfd5f8; }
+
+/* tool tip */
+.h01a a, .h01a a.tooltip { color:#fff; }
+.h01a a.tooltip { display: block; font-size: 9px; margin-right:10px; padding: 3px; }
+.h01a a.tooltip:hover, .h01a a.tooltipOn {background: #FFE4AF; border-bottom: none; color: #000; display: block; font-weight: bold;font-size: 9px; margin-right: 10px; padding: 3px; text-decoration: none; white-space: nowrap;}
+
+table.subTabs td {white-space:nowrap;border-bottom:1px solid #999999;background-color:#eeeeee;}
+table.subTabs td.on, table.subTabs td.off{white-space:nowrap;}
+table.subTabs td a {display: block;text-decoration:none;color:#0158c4;font:bold 11px arial;padding:4px 10px;}
+table.subTabs td.on a {color:#000;}
+table.subTabs td.on a:hover{background-color: #fff;}
+table.subTabs td.on {background-color:#fff;border-top:1px solid #000;border-left:1px solid #000;border-right:1px solid #000;border-bottom:1px solid #fff;}
+table.subTabs span.pipe{color:#999999;}
+
+.h01a tbody tr td table tbody tr td.ctime{color:#000}

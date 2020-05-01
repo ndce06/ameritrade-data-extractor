@@ -1,0 +1,165 @@
+/* universal tabular data chunk */
+.t0 { width:100%; border-bottom:1px solid #808080; }
+.t0 tr.header td, .t0 tr.greyHeader td { height:25px; font-size: 10px; background-color:#f7f7f7; border-top:1px solid #808080; }
+.t0 tr.header td.normText {font-size:11px;}
+.t0 tr.noBorder td { height:25px; font-size:10px; background-color:#f7f7f7; border-top:none; }
+.t0 tr.greyHeader td { color:#7f7f7f; }
+.t0 tr.header a { color:#00456C; font-weight:normal; }
+.t0 tr.header a.sortLink{font-size: 11px; font-weight: bold;}
+.t0 td{ height:25px; font-size:12px; white-space:nowrap; }
+.t0 td span{font-size:11px;}
+/*Fixed income styles*/
+.fixedIncome td{padding: 3px 0; height: 19px; white-space:nowrap;}
+.fixedIncome tr.header td{vertical-align: bottom;}
+.fixedIncome tr.data td{padding-top: 3px; padding-bottom: 3px; height: 19px; vertical-align: top;}
+.t0FIForms{width: 100%;}
+.t0FIForms td{border: none; padding-top: 5px; padding-bottom: 5px;}
+.t0FIForms tr.header td{height:25px; font-size: 10px; background-color:#f7f7f7; border-top:1px solid #808080; }
+.fixedIncome tr.highlight td{background-color: #ecf7eb !important;}
+.t0FIForms tr.lastPad td{padding-top: 15px;}
+.t0FIForms .spacerWidth{width: 10px;}
+.t0FIForms .labelWidth{width: 55px;}
+.t0FIForms .formWidth{width: 105px;}
+.t0FIForms .formDoubleWidth{width: 220px;}
+.t0FIForms .formWidthPercent{width: 90px;}
+.t0FIForms span.formPercent{font-size: 11px; padding-left: 3px;}
+.t0FIForms p{margin: 0; padding: 0;}
+.t0FIForms p.label, td.label{font-weight: bold; font-size: 12px; margin: 0; padding: 0 0 3px 0;}
+.t0FIForms p.arrow{margin: 0; padding: 1px 0;}
+.t0FIKeyRates{width: 190px; border-bottom:1px solid #808080;}
+.t0FIKeyRates tr.header td{height:25px; font-size:10px; background-color:#f7f7f7; border-top:1px solid #808080; }
+.t0FIKeyRates td{padding: 0 3px;}
+.t0FIKeyRates td.last{padding: 0 4px 0 2px;}
+.t0FIKeyRates td.first{padding: 0 2px 0 4px;}
+td.bondDetail{font-weight: bold; font-size: 16px; padding: 0 15px 0 0;}
+/*Fixed income styles*/
+.t0 a { color:#3366CC; }
+.t0 .bottom { height:26px; border-top:1px solid #808080; border-bottom:none; }
+.t0 .bottomBorder { height:26px; }
+.t0 .bottomFootnote { font-size:9px; color:#666; height:26px; white-space:nowrap; padding-top:4px; padding-bottom:26px; }
+.t0 .focus { background-color:#ECF7EB; }
+.t0 .wrap { white-space:normal; padding-top:6px; padding-bottom:6px; line-height:16px; }
+.t0 .noWrap { white-space:nowrap; padding-top:6px; padding-bottom:6px; line-height:16px;  }
+a.orangeText { color:#D5801E; font-weight: bold; font-size: 11px; }
+.arialText td{font-size: 12px;}
+.fixedIncome tr.data td a{font-weight: normal;}
+
+/* left and right margins and inbetween each cols*/
+.t0 .margins { width:10px; }
+.t0 .inbetween { width:18px; }
+
+.t0 tr.rows td, .t0 tr.altrows td { background-color:#fff; border-top:1px solid #d8d8d8; }
+.t0 tr.noHeader td{border-top:1px solid #808080;}
+.t0 tr.rowsBorderOff td, .t0 tr.altrowsBorderOff td { border:none; }
+.t0 tr.cancelrows td { background-color:#ffe4af; border-top:1px solid #ccc; }
+.t0 tr.modifiedrows td { background-color:#D9E5F8; border-top:1px solid #ccc; }
+.t0 tr.rowsSaved td { background-color:#fcedb0; border-top:1px solid #ccc; }
+.t0 td a.symbolLink div { cursor:pointer; cursor:hand; }
+.t0 td a.symbolLink:hover div { background-color: #FFE4AF !important; color:#000 !important; text-decoration: none; cursor:pointer; cursor:hand; }
+
+/* EXCEPTIONS */
+
+/* account settings... header divider for preferences */
+.t0 tr.prefHeader td { color:#000; background-color:#eee; border-top:1px solid #808080; border-bottom:1px solid #808080; }
+
+/* balances and positions */
+/* aggregate */
+.t0 tr.topRow td { border-top:1px solid #d8d8d8; }
+.t0 tr.row3 td { border-top:1px solid #d8d8d8; }
+.t0 tr.row3bold td { border-top:1px solid #d8d8d8; font-weight:bold !important; }
+
+.t0 tr.resultPaging td a{font-weight: normal;}
+.t0 tr.resultPaging td span{color: #ccc;}
+.t0 tr.resultHeading td{padding: 5px 0; height: 15px;}
+.t0 tr.resultHeading p{line-height: 16px; margin: 0; padding: 0;}
+.t0 tr.resultHeading a.prospectusLink{font-weight: normal; margin: 0 0 0 10px; padding: 0 0 1px 18px;}
+.t0 tr.resultHeading a.prospectusLink:hover{background-color: #FFE4AF; color:#000 !important; text-decoration: none;}
+
+.superTotal td { height:25px; background-color:#ecf7eb; border-top:1px solid #c1deb1; border-bottom:1px solid #808080; white-space:nowrap; }
+
+.tierOne { background-color:#e5e5e3; color:#000; }
+.tierOne td { height:25px; font-size: 11px; white-space:nowrap; border-bottom:1px solid #fff; }
+.tierOne a, .tierOne a.orange { color:#0158C4; font-weight:bold; }
+.tierOne a.orange { color:#D5801E; font-weight: bold; font-size: 11px; }
+.tierOne td span.newWindow { font-size: 11px }
+
+.tierTwo td { height:25px; font-size: 11px; white-space:nowrap; }
+.tierTwo td span.newWindow { font-size: 11px; }
+
+.longShortMargin { width:auto; margin-left:21px; }
+* html .longShortMargin { width: 100%; }
+/* balances and positions */
+
+/* plans mod */
+.planSect td { height:20px; font-size: 11px; white-space:normal; border-top:1px solid #fff; padding:5px 0px; line-height:14px; vertical-align:top; }
+.planSect tr.header td { font-weight:bold; background-color:#e5e5e3; color:#000; }
+.planSect tbody.plans td { background-color:#fff; border-top:1px solid #808080; border-bottom:1px solid #d8d8d8; }
+.planSect tbody.plans td a { font-weight:normal; }
+.planSect tbody.plans tr.last td { border-bottom:1px solid #808080; }
+
+/* trade triggers view page */
+.ttView tbody { border-bottom:1px solid #ccc; }
+.ttView { width:100%; border-top:1px solid #ccc; }
+.ttView td { height:25px; font-size: 11px; white-space:nowrap; line-height:16px; padding-top:5px; padding-bottom:5px; border-bottom:1px solid #d8d8d8; }
+.ttView tr.noBorder td { border:none; }
+.ttView .noBottom td { height:16px; border-bottom:1px solid #fff; }
+.ttView .action, .rejected, .accepted { font-size:11px; font-weight:bold; }
+.ttView .rejected { color:#ff0000; }
+.ttView .accepted { color:#009900; }
+.ttView a .accepted { color:#009900; }
+.ttView a { color:#3366CC; }
+
+/* option order pages */
+.us01 { margin:4px 0px 0px 9px}
+.us01 td { padding-right:8px;white-space:nowrap;}
+.us01 tr.links td {font-size: 10px;height:11px;line-height:11px;}
+.us01 tr.links span.sep{margin:0px 3px 0px 3px;color:#666; font-size: 10px;height:11px;}
+.us01 a.padRight{margin-right:9px}
+.us01 tr.padTop td{padding-top:2px}
+
+.oh01 {margin: 10px 0px;}
+.oh01 td.header{white-space:nowrap;font-size:14px;font-weight:bold;}
+.oh01 td{padding-right:10px;}
+.oh01 a {font-size: 10px;color:#0158c4}
+
+.forms {border-collapse: separate;}
+.forms td.top { border-top:1px dotted #808080; }
+.forms td.bottom { border-bottom:1px dotted #808080; }
+.forms td.bufferTop { height:8px; }
+.forms td { height:23px; white-space:nowrap; }
+.forms tr.hr td { height:13px; border-bottom:1px dotted #808080; }
+.forms input { padding-left:3px; }
+br.forms{height: 1px; line-height: 1px; font-size: 1px;}
+
+/* this is the correct forms */
+.f0 {border-collapse: separate;}
+.f0 td.top { border-top:1px dotted #808080; }
+.f0 td.left { border-left:1px dotted #808080;background-color:#fff;}
+.f0 td.bottom { border-bottom:1px dotted #808080; }
+.f0 td.bufferTop { height:12px; }
+.f0 td{ font-size: 12px; height:23px; white-space:nowrap; }
+.f0 #c2,.f0 #s2 {font-size: 12px; height:23px;line-height:23px;white-space:nowrap;vertical-align:bottom;}
+.f0 tr.hr td { height:13px; border-bottom:1px dotted #808080; }
+.f0 input, .f0 select, .us01 input { font-size: 11px; padding-left:3px; }
+.f0 .formLabel, .us01 .formLabel { font-weight: bold; font-size: 12px; }
+div .formValue { font-size: 12px;padding-left:8px;}
+.f0 .para { font-size: 12px; white-space:normal; }
+br.f0 { height: 1px; line-height: 1px; font-size: 1px; }
+.f0 td.newLabel {font-weight:bold;font-size:12px;height:16px;line-height:16px;white-space:nowrap;vertical-align:bottom;}
+
+td.bottom { vertical-align: bottom; }
+
+/*inline quotes*/
+.inlnQDiv {width:100%;height:69px;}
+.inlnQ,.inlnQspacer{width:275px;}
+.inlnQ td{background-color:#fff;height:13px;font-size: 11px;color:#000000;padding-left:8px;padding-right:0px;}
+.inlnQ td span{font-weight: bold; font-size: 11px;padding-left:6px;}
+.inlnQ td.quotes span{font-size: 11px;color:#000000;padding-right:2px;padding-left:2px;}
+.inlnQ td.quotes{font-size: 11px;color:#666;}
+.inlnQ td.first{padding-top:6px;}
+.inlnQ td.last{padding-bottom:7px;color:#666;}
+.inlnQMain, .inlnQMain td {background-color:#EDF8FE;}
+
+.BuyIndicator, .SellIndicator { height: 19px; padding-left: 2px;}
+.BuyIndicator { border-left: 4px solid #0D9023; }
+.SellIndicator { border-left: 4px solid #ff0000; }
